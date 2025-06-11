@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Web Scraper - Start{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="jumbotron bg-light p-5 rounded">
+            <h1 class="display-4">Web Scraper</h1>
+            <p class="lead">System rozproszony do automatycznego pobierania i analizy danych z witryn internetowych.</p>
+            <hr class="my-4">
+            <p>Rozpocznij od dodania URL-i do przetworzenia lub przejrzyj wcześniejsze wyniki.</p>
+            <div class="d-grid gap-2 d-md-block">
+                <a class="btn btn-primary btn-lg" href="{{ url_for('scrape') }}">Rozpocznij Scraping</a>
+                <a class="btn btn-outline-secondary btn-lg" href="{{ url_for('results') }}">Zobacz Wyniki</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Zbierane dane</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li>📧 <strong>Adresy email</strong></li>
+                    <li>📞 <strong>Numery telefonów</strong></li>
+                    <li>📍 <strong>Adresy pocztowe</strong></li>
+                    <li>📑 <strong>Nagłówki stron</strong></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Architektura systemu</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li>🖥️ <strong>Interface</strong> - Flask Web</li>
+                    <li>⚙️ <strong>Silnik</strong> - Multiprocessing + AsyncIO</li>
+                    <li>🗄️ <strong>Baza danych</strong> - MongoDB</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

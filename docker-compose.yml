@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # Interface - Flask Web App
+  interface:
+    build:
+      context: .
+    ports:
+      - "5000:5000"
+    environment:
+      - ENGINE_API_URL=http://engine:5001
+      - DATABASE_API_URL=http://database:5002
+      - FLASK_ENV=production
+    depends_on:
+      - engine
+      - database
+    networks:
+      - scraper-network
+
+  # Engine - Scraping Service  
+  engine:
+    build:
+      context: .
+      dockerfile: engine/Dockerfile
+    ports:
+      - "5001:5001"
+    networks:
+      - scraper-network
+
+  # Database - API (MongoDB Atlas)
+  database:
+    build:
+      context: .
+      dockerfile: database/Dockerfile
+    ports:
+      - "5002:5002"
+    environment:
+      - MONGODB_ATLAS_URI=${MONGODB_ATLAS_URI}
+      - MONGODB_DBNAME=scraper
+      - MONGODB_COLLECTION=results
+    networks:
+      - scraper-network
+
+networks:
+  scraper-network:
+    driver: bridge

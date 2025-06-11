@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Web Scraper - Wyniki{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Wyniki scrapingu</h2>
+    <div>
+        <a href="{{ url_for('scrape') }}" class="btn btn-primary">Nowy scraping</a>
+        <a href="{{ url_for('clear_results') }}" class="btn btn-outline-danger ms-2" 
+           onclick="return confirm('Czy na pewno chcesz wyczyścić wszystkie wyniki?')">Wyczyść</a>
+    </div>
+</div>
+
+{% if stats %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.total_pages }}</h5>
+                <p class="card-text">Stron</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.total_emails }}</h5>
+                <p class="card-text">Emaili</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.total_phones }}</h5>
+                <p class="card-text">Telefonów</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.total_addresses }}</h5>
+                <p class="card-text">Adresów</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if results %}
+    {% for result in results %}
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+                <a href="{{ result.url }}" target="_blank" class="text-decoration-none">
+                    {{ result.title or result.url }}
+                </a>
+            </h6>
+            <form method="post" action="{{ url_for('results') }}" style="margin:0;">
+                <input type="hidden" name="delete_url" value="{{ result.url }}">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Usunąć ten wynik?')">Usuń</button>
+            </form>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    {% if result.emails %}
+                    <h6>📧 Emaile ({{ result.emails|length }})</h6>
+                    <ul class="list-unstyled small">
+                        {% for email in result.emails %}
+                        <li>{{ email }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+
+                    {% if result.phones %}
+                    <h6>📞 Telefony ({{ result.phones|length }})</h6>
+                    <ul class="list-unstyled small">
+                        {% for phone in result.phones %}
+                        <li>{{ phone }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    {% if result.addresses %}
+                    <h6>📍 Adresy ({{ result.addresses|length }})</h6>
+                    <ul class="list-unstyled small">
+                        {% for address in result.addresses %}
+                        <li>{{ address }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+
+                    {% if result.headings %}
+                    <h6>📑 Nagłówki ({{ result.headings|length }})</h6>
+                    <ul class="list-unstyled small">
+                        {% for heading in result.headings %}
+                        <li>{{ heading }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="text-center py-5">
+        <h4 class="text-muted">Brak wyników</h4>
+        <p>Rozpocznij nowy scraping, aby zobaczyć wyniki tutaj.</p>
+        <a href="{{ url_for('scrape') }}" class="btn btn-primary">Rozpocznij scraping</a>
+    </div>
+{% endif %}
+{% endblock %}

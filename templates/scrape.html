@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Web Scraper - Start{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Wprowadź URL-e do scrapowania</h4>
+                <form method="post" action="{{ url_for('scrape') }}">
+                    <div class="mb-3">
+                        <label for="urls" class="form-label">Adresy URL (każdy w nowej linii):</label>
+                        <textarea class="form-control" id="urls" name="urls" rows="5" placeholder="https://example.com&#10;https://another.com"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Rozpocznij scraping</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="jumbotron bg-light p-5 rounded">
+            <h1 class="display-4">Web Scraper</h1>
+            <p class="lead">System rozproszony do automatycznego pobierania i analizy danych z witryn internetowych.</p>
+            <hr class="my-4">
+            <p>Rozpocznij od dodania URL-i do przetworzenia lub przejrzyj wcześniejsze wyniki.</p>
+            <div class="d-grid gap-2 d-md-block">
+                <a class="btn btn-primary btn-lg" href="{{ url_for('scrape') }}">Rozpocznij Scraping</a>
+                <a class="btn btn-outline-secondary btn-lg" href="{{ url_for('results') }}">Zobacz Wyniki</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Zbierane dane</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li>📧 <strong>Adresy email</strong></li>
+                    <li>📞 <strong>Numery telefonów</strong></li>
+                    <li>📍 <strong>Adresy pocztowe</strong></li>
+                    <li>📑 <strong>Nagłówki stron</strong></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Architektura systemu</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li>🖥️ <strong>Interface</strong> - Flask Web</li>
+                    <li>⚙️ <strong>Silnik</strong> - Multiprocessing + AsyncIO</li>
+                    <li>🗄️ <strong>Baza danych</strong> - MongoDB</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
