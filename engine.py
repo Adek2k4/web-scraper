@@ -14,10 +14,26 @@ import logging
 from urllib.parse import urlparse
 
 # wzorce do wyodrebniania danych
-EMAIL_PATTERN = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b')
-PHONE_PATTERN = re.compile(r'(?:\+\d{1,3}\s?)?\d{2,3}[-\s]?\d{3}[-\s]?\d{2,4}')
-ADDRESS_PATTERN = re.compile(r'\d{2}-\d{3}\s+[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż\s]+')
+# wzorzec: cokolwiek@cokolwiek.cokolwiek (jeszcze bardziej tolerancyjny, pozwala na polskie znaki i nie wymaga znaków przed @)
+EMAIL_PATTERN = re.compile(
+    r'[a-zA-Z0-9_.+-ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]*@[a-zA-Z0-9-_.ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+\.[a-zA-Z0-9-.ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+'
+)
 
+# wzorzec na polskie numery telefonow: 9 cyfr, dowolne separatory (spacja, myślnik), także formaty z dwucyfrowym prefixem
+PHONE_PATTERN = re.compile(
+    r'\b(?:\+48[-\s]?)?(?:\d{2}[-\s]?\d{3}[-\s]?\d{2}[-\s]?\d{2}|\d{3}[-\s]?\d{3}[-\s]?\d{3})\b'
+)
+
+ADDRESS_PATTERN = re.compile(r'''(?x)
+    (?:
+        (?:ul\.|al\.|pl\.|\b)\s*
+        [A-ZŻŹĆĄŚĘŁÓŃ][a-zżźćąśęłóń]+(?:\s+[A-ZŻŹĆĄŚĘŁÓŃ][a-zżźćąśęłóń]+)*\s+
+        \d+(?:[A-Z])?(?:\s*/?[a-z]?\s*\d+)?
+        ,?\s*
+        \d{2}[-\s]?\d{3}\s+
+        [A-ZŻŹĆĄŚĘŁÓŃ][a-zżźćąśęłóń]+(?:\s+[A-ZŻŹĆĄŚĘŁÓŃ][a-zżźćąśęłóń]+)*
+    )
+''', re.VERBOSE)
 def is_valid_url(url):
     """prosta walidacja url"""
     try:
@@ -42,23 +58,30 @@ def parse_html(html_content, url):
     """parsuje html i wyodrebnia dane"""
     if not html_content:
         return None
-    
+
     soup = BeautifulSoup(html_content, 'html.parser')
-    
+
     # usun skrypty i style
     for tag in soup(['script', 'style']):
         tag.decompose()
-    
-    text = soup.get_text()
+
+    # zamien znaki niewidoczne na spacje, by nie sklejac slow
+    text = soup.get_text(separator=' ')
     title = soup.find('title')
     title = title.get_text() if title else ""
-    
+
     # wyodrebnianie danych - 4 grupy
-    emails = EMAIL_PATTERN.findall(text)[:5]
-    phones = PHONE_PATTERN.findall(text)[:3]  
-    addresses = ADDRESS_PATTERN.findall(text)[:2]
-    headings = [h.get_text().strip() for h in soup.find_all(['h1', 'h2', 'h3'])[:10]]
-    
+    emails = EMAIL_PATTERN.findall(text)
+    phones = []
+    for match in PHONE_PATTERN.finditer(text):
+        phone = match.group().strip()
+        digits_only = re.sub(r'\D', '', phone)
+        if len(digits_only) > 15:
+            continue
+        phones.append(phone)
+    addresses = ADDRESS_PATTERN.findall(text)
+    headings = [h.get_text().strip() for h in soup.find_all(['h1', 'h2', 'h3'])]
+
     return {
         'url': url,
         'title': title,
@@ -166,5 +189,7 @@ def main():
     print(f"telefony: {total_phones}")
 
 if __name__ == "__main__":
+    mp.freeze_support()
+    main()
     mp.freeze_support()
     main()
